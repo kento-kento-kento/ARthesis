@@ -6,138 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>卒論ARアプリ</title>
 
+  <!-- A-FrameとAR.js -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/3.4.7/aframe/build/aframe-ar.js"></script>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      overflow: hidden;
-      font-family: sans-serif;
-      background: #000;
-    }
-
-    a-scene {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-    }
-
-    .top-panel {
-      position: fixed;
-      top: max(16px, env(safe-area-inset-top));
-      left: 12px;
-      right: 12px;
-      z-index: 10;
-      padding: 16px;
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.96);
-      color: #222;
-      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.16);
-      pointer-events: none;
-    }
-
-    .top-panel h1 {
-      margin: 0 0 8px;
-      font-size: 20px;
-      line-height: 1.4;
-    }
-
-    .top-panel p {
-      margin: 0;
-      font-size: 16px;
-      line-height: 1.6;
-    }
-
-    .bottom-panel {
-      position: fixed;
-      left: 12px;
-      right: 12px;
-      bottom: max(16px, env(safe-area-inset-bottom));
-      z-index: 10;
-      padding: 18px 16px;
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.97);
-      box-shadow: 0 3px 16px rgba(0, 0, 0, 0.2);
-    }
-
-    .panel-title {
-      margin: 0 0 10px;
-      font-size: 18px;
-      font-weight: bold;
-      color: #222;
-    }
-
-    .level-select {
-      width: 100%;
-      min-height: 54px;
-      padding: 12px;
-      border: 2px solid #1769e0;
-      border-radius: 12px;
-      background: #fff;
-      color: #222;
-      font-size: 17px;
-    }
-
-    .level-description {
-      margin: 12px 0 0;
-      color: #333;
-      font-size: 15px;
-      line-height: 1.6;
-    }
-
-    .selection-status {
-      margin: 8px 0 0;
-      color: #1455b8;
-      font-size: 14px;
-      font-weight: bold;
-    }
-
-    @media (max-height: 650px) {
-      .top-panel {
-        padding: 10px 12px;
-      }
-
-      .top-panel h1 {
-        font-size: 17px;
-        margin-bottom: 4px;
-      }
-
-      .top-panel p {
-        font-size: 14px;
-      }
-
-      .bottom-panel {
-        padding: 12px;
-      }
-
-      .panel-title {
-        font-size: 16px;
-        margin-bottom: 6px;
-      }
-
-      .level-select {
-        min-height: 46px;
-        font-size: 16px;
-      }
-
-      .level-description {
-        margin-top: 6px;
-        font-size: 13px;
-      }
-
-      .selection-status {
-        margin-top: 4px;
-        font-size: 12px;
-      }
-    }
-  </style>
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -149,6 +23,7 @@
     renderer="antialias: true; alpha: true">
 
     <a-marker preset="hiro">
+      <!-- 赤い立方体 -->
       <a-box
         position="0 0.5 0"
         color="red"
@@ -156,8 +31,10 @@
         scale="1 1 1">
       </a-box>
 
+      <!-- 日本語のAR案内 -->
       <a-text
-        value="この部品を取り付けて"
+        value="この部品を
+        取り付けて"
         position="0 1 0"
         rotation="-90 0 0"
         align="center"
@@ -174,53 +51,43 @@
     <a-entity camera></a-entity>
   </a-scene>
 
-  <!-- 画面上部 -->
+  <!-- コンパクトな上部タイトル -->
   <header class="top-panel">
     <h1>AR組立作業サポート</h1>
-    <p>マーカーをカメラに映し、表示された案内に従って作業してください。</p>
   </header>
 
-  <!-- 画面下部 -->
-  <section class="bottom-panel">
+  <!-- 提示情報量の設定パネル -->
+  <section
+    id="settings-panel"
+    class="bottom-panel"
+    aria-label="提示情報量の設定"
+    aria-hidden="true">
+
     <p class="panel-title">提示情報量</p>
 
-    <select id="level-select" class="level-select" aria-label="提示情報量を選択">
+    <select
+      id="level-select"
+      class="level-select"
+      aria-label="提示情報量を選択">
+
       <option value="low">少ない：部品・取り付け位置</option>
       <option value="medium" selected>標準：手順・部品の向き</option>
       <option value="high">詳しい：注意点も表示</option>
     </select>
-
-    <p id="level-description" class="level-description">
-      部品の取り付け位置に加えて、向きや作業手順を確認できます。
-    </p>
-
-    <p id="selection-status" class="selection-status" aria-live="polite">
-      現在の設定：標準
-    </p>
   </section>
 
-  <script>
-    const select = document.getElementById("level-select");
-    const description = document.getElementById("level-description");
-    const status = document.getElementById("selection-status");
+  <!-- 設定パネルを開閉するボタン -->
+  <button
+    id="settings-button"
+    class="settings-button"
+    type="button"
+    aria-label="設定を開く"
+    aria-expanded="false"
+    aria-controls="settings-panel">
+    ⚙
+  </button>
 
-    const descriptions = {
-      low: "次に取り付ける部品と、その取り付け位置を確認できます。",
-      medium: "部品の取り付け位置に加えて、向きや作業手順を確認できます。",
-      high: "部品・位置・向き・手順に加えて、注意点も確認できます。"
-    };
-
-    const names = {
-      low: "少ない",
-      medium: "標準",
-      high: "詳しい"
-    };
-
-    select.addEventListener("change", () => {
-      const level = select.value;
-      description.textContent = descriptions[level];
-      status.textContent = "現在の設定：" + names[level];
-    });
-  </script>
+  <!-- JavaScript -->
+  <script src="script.js"></script>
 </body>
 </html>
