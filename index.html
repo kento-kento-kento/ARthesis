@@ -5,7 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>卒論ARアプリ</title>
-
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
+    </style>
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/3.4.7/aframe/build/aframe-ar.js"></script>
 </head>
@@ -21,8 +23,25 @@
       <a-box
         position="0 0.5 0"
         color="red"
+        wireframe="true"
         scale="1 1 1">
       </a-box>
+
+      
+        <a-text
+            value="この部品を
+            取付けて"
+            position="0 1 0"
+            rotation="-90 0 0"
+            align="center"
+            color="#FFFF00"
+            width="6"
+            font="https://cdn.jsdelivr.net/gh/studioTeaTwo/aframe-japanese-font@main/fonts/noto-sans-cjk-jp/noto-sans-cjk-jp-msdf.json"
+            font-image="https://cdn.jsdelivr.net/gh/studioTeaTwo/aframe-japanese-font@main/fonts/noto-sans-cjk-jp/noto-sans-cjk-jp-msdf.png"
+            shader="msdf"
+            negate="false"
+            side="double">
+        </a-text> 
     </a-marker>
 
     <a-entity camera></a-entity>
