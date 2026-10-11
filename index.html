@@ -15,6 +15,105 @@
 </head>
 
 <body>
+
+    
+<!-- ① タイトル画面 -->
+    <section id="title-screen" class="app-screen">
+    <h1>AR組立作業サポート</h1>
+    <p>組み立て作業をARで支援する実験アプリです。</p>
+
+    <button id="show-help-button" type="button">
+        操作説明
+    </button>
+
+    <button id="go-to-setup-button" type="button">
+        実験に進む
+    </button>
+    </section>
+
+    <!-- ② 操作説明画面 -->
+    <section id="help-screen" class="app-screen" hidden>
+    <h2>操作説明</h2>
+    <ol>
+        <li>画面の案内に従って組み立て作業を進めます。</li>
+        <li>前の手順・次の手順で表示する手順を切り替えます。</li>
+        <li>情報量の設定から案内の詳しさを変更できます。</li>
+        <li>実験中は、指定された条件に従って操作してください。</li>
+    </ol>
+
+    <button id="help-back-button" type="button">
+        タイトルに戻る
+    </button>
+    </section>
+
+
+<!-- ③ 参加者・実験設定画面 -->
+<section id="setup-screen" class="app-screen" hidden>
+  <h2>実験設定</h2>
+
+  <label for="participant-id">参加者ID</label>
+  <input
+    id="participant-id"
+    type="text"
+    placeholder="例：P001"
+    autocomplete="off"
+  >
+
+  <label for="session-id">セッションID</label>
+  <input
+    id="session-id"
+    type="text"
+    placeholder="例：S01"
+    autocomplete="off"
+  >
+
+  <label for="participant-age">年齢</label>
+  <input
+    id="participant-age"
+    type="number"
+    min="18"
+    max="100"
+    placeholder="例：21"
+  >
+
+  <label for="ar-experience">ARの使用経験</label>
+  <select id="ar-experience">
+    <option value="none">使ったことがない</option>
+    <option value="little">少し使ったことがある</option>
+    <option value="often">よく使う</option>
+  </select>
+
+  <label for="assembly-experience">組立作業の経験</label>
+  <select id="assembly-experience">
+    <option value="none">ほとんど経験がない</option>
+    <option value="little">少し経験がある</option>
+    <option value="often">よく経験する</option>
+  </select>
+
+  <label for="experiment-condition">実験条件</label>
+  <select id="experiment-condition">
+    <option value="fixed_low">情報量固定：少ない</option>
+    <option value="fixed_medium">情報量固定：標準</option>
+    <option value="fixed_high">情報量固定：詳しい</option>
+    <option value="self_adjust" selected>情報量を自己調整</option>
+  </select>
+
+  <p id="setup-error" role="alert"></p>
+
+  <button id="start-ar-button" type="button">
+    AR画面へ進む
+  </button>
+
+  <button id="setup-back-button" type="button">
+    タイトルに戻る
+  </button>
+</section>
+
+
+
+
+
+
   <!-- ARカメラとマーカー -->
   <a-scene
     embedded
@@ -58,6 +157,19 @@
     <h1>AR組立作業サポート</h1>
   </header>
 
+  
+    <!-- 実験経過時間 -->
+    <div id="experiment-timer" class="experiment-timer" hidden>
+    <span>実験経過時間</span>
+    <span id="elapsed-time">00:00:00</span>
+    </div>
+
+    <!-- タイマー操作 -->
+    <div id="timer-controls" class="timer-controls" hidden>
+    <button id="pause-timer-button" type="button">一時停止</button>
+    <button id="end-experiment-button" type="button">実験終了</button>
+    </div>
+
   <!-- 提示情報量の設定パネル -->
   <section
     id="settings-panel"
@@ -66,6 +178,13 @@
     aria-hidden="true">
 
     <p class="panel-title">提示情報量</p>
+        <div class="condition-controls">
+    <p class="panel-title">実験条件</p>
+    <p id="current-condition-label">現在の条件：未設定</p>
+    <button id="next-condition-button" type="button">
+        次の実験条件へ進む
+    </button>
+    </div>
 
     <select
       id="level-select"
@@ -93,6 +212,17 @@
     aria-controls="settings-panel">
     ⚙
   </button>
+
+  
+    <!-- 実験終了画面 -->
+    <section id="end-screen" class="app-screen" hidden>
+    <h2>実験終了</h2>
+    <p>実験が終了しました。</p>
+    <p>計測時間：<strong id="final-elapsed-time">00:00:00</strong></p>
+    <button id="return-title-button" type="button">
+        タイトルに戻る
+    </button>
+    </section>
 
   <!-- JavaScript -->
    <script src="instructions.js"></script>
