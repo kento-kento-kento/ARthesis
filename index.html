@@ -3,14 +3,118 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>卒論ARアプリ</title>
 
+  <!-- A-FrameとAR.js -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/3.4.7/aframe/build/aframe-ar.js"></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
 </head>
 
-<body style="margin: 0; overflow: hidden;">
+<body>
+
+    
+<!-- ① タイトル画面 -->
+    <section id="title-screen" class="app-screen">
+    <h1>AR組立作業サポート</h1>
+    <p>組み立て作業をARで支援する実験アプリです。</p>
+
+    <button id="show-help-button" type="button">
+        操作説明
+    </button>
+
+    <button id="go-to-setup-button" type="button">
+        実験に進む
+    </button>
+    </section>
+
+    <!-- ② 操作説明画面 -->
+    <section id="help-screen" class="app-screen" hidden>
+    <h2>操作説明</h2>
+    <ol>
+        <li>画面の案内に従って組み立て作業を進めます。</li>
+        <li>前の手順・次の手順で表示する手順を切り替えます。</li>
+        <li>情報量の設定から案内の詳しさを変更できます。</li>
+        <li>実験中は、指定された条件に従って操作してください。</li>
+    </ol>
+
+    <button id="help-back-button" type="button">
+        タイトルに戻る
+    </button>
+    </section>
+
+
+<!-- ③ 参加者・実験設定画面 -->
+<section id="setup-screen" class="app-screen" hidden>
+  <h2>実験設定</h2>
+
+  <label for="participant-id">参加者ID</label>
+  <input
+    id="participant-id"
+    type="text"
+    placeholder="例：P001"
+    autocomplete="off"
+  >
+
+  <label for="session-id">セッションID</label>
+  <input
+    id="session-id"
+    type="text"
+    placeholder="例：S01"
+    autocomplete="off"
+  >
+
+  <label for="participant-age">年齢</label>
+  <input
+    id="participant-age"
+    type="number"
+    min="18"
+    max="100"
+    placeholder="例：21"
+  >
+
+  <label for="ar-experience">ARの使用経験</label>
+  <select id="ar-experience">
+    <option value="none">使ったことがない</option>
+    <option value="little">少し使ったことがある</option>
+    <option value="often">よく使う</option>
+  </select>
+
+  <label for="assembly-experience">組立作業の経験</label>
+  <select id="assembly-experience">
+    <option value="none">ほとんど経験がない</option>
+    <option value="little">少し経験がある</option>
+    <option value="often">よく経験する</option>
+  </select>
+
+  <label for="experiment-condition">実験条件</label>
+  <select id="experiment-condition">
+    <option value="fixed_low">情報量固定：少ない</option>
+    <option value="fixed_medium">情報量固定：標準</option>
+    <option value="fixed_high">情報量固定：詳しい</option>
+    <option value="self_adjust" selected>情報量を自己調整</option>
+  </select>
+
+  <p id="setup-error" role="alert"></p>
+
+  <button id="start-ar-button" type="button">
+    AR画面へ進む
+  </button>
+
+  <button id="setup-back-button" type="button">
+    タイトルに戻る
+  </button>
+</section>
+
+
+
+
+
+
+  <!-- ARカメラとマーカー -->
   <a-scene
     embedded
     vr-mode-ui="enabled: false"
@@ -18,14 +122,110 @@
     renderer="antialias: true; alpha: true">
 
     <a-marker preset="hiro">
+      <!-- 赤い立方体 -->
       <a-box
         position="0 0.5 0"
         color="red"
+        wireframe="false" 
         scale="1 1 1">
       </a-box>
+
+      <!-- 日本語のAR案内 -->
+      <a-text
+        id="ar-instruction"
+        value="この部品を
+        取り付けて"
+        position="0 1.1 0"
+        rotation="-90 0 0"
+        align="center"
+        color="#FFFF00"
+        width="6"
+        scale="0.7 0.7 0.7"
+        font="https://cdn.jsdelivr.net/gh/studioTeaTwo/aframe-japanese-font@main/fonts/noto-sans-cjk-jp/noto-sans-cjk-jp-msdf.json"
+        font-image="https://cdn.jsdelivr.net/gh/studioTeaTwo/aframe-japanese-font@main/fonts/noto-sans-cjk-jp/noto-sans-cjk-jp-msdf.png"
+        shader="msdf"
+        negate="false"
+        side="double">
+      </a-text>
     </a-marker>
 
     <a-entity camera></a-entity>
   </a-scene>
+
+  <!-- コンパクトな上部タイトル -->
+  <header class="top-panel">
+    <h1>AR組立作業サポート</h1>
+  </header>
+
+  
+    <!-- 実験経過時間 -->
+    <div id="experiment-timer" class="experiment-timer" hidden>
+    <span>実験経過時間</span>
+    <span id="elapsed-time">00:00:00</span>
+    </div>
+
+    <!-- タイマー操作 -->
+    <div id="timer-controls" class="timer-controls" hidden>
+    <button id="pause-timer-button" type="button">一時停止</button>
+    <button id="end-experiment-button" type="button">実験終了</button>
+    </div>
+
+  <!-- 提示情報量の設定パネル -->
+  <section
+    id="settings-panel"
+    class="bottom-panel"
+    aria-label="提示情報量の設定"
+    aria-hidden="true">
+
+    <p class="panel-title">提示情報量</p>
+        <div class="condition-controls">
+    <p class="panel-title">実験条件</p>
+    <p id="current-condition-label">現在の条件：未設定</p>
+    <button id="next-condition-button" type="button">
+        次の実験条件へ進む
+    </button>
+    </div>
+
+    <select
+      id="level-select"
+      class="level-select"
+      aria-label="提示情報量を選択">
+
+      <option value="low">少ない：部品・取り付け位置</option>
+      <option value="medium" selected>標準：手順・部品の向き</option>
+      <option value="high">詳しい：注意点も表示</option>
+    </select>
+    <div class="step-controls">
+        <button id="prev-step-button" type="button">前の手順に進む</button>
+        <span id="step-counter">手順 1 / 2</span>
+        <button id="next-step-button" type="button">次の手順に進む</button>
+    </div>
+  </section>
+
+  <!-- 設定パネルを開閉するボタン -->
+  <button
+    id="settings-button"
+    class="settings-button"
+    type="button"
+    aria-label="設定を開く"
+    aria-expanded="false"
+    aria-controls="settings-panel">
+    ⚙
+  </button>
+
+  
+    <!-- 実験終了画面 -->
+    <section id="end-screen" class="app-screen" hidden>
+    <h2>実験終了</h2>
+    <p>実験が終了しました。</p>
+    <p>計測時間：<strong id="final-elapsed-time">00:00:00</strong></p>
+    <button id="return-title-button" type="button">
+        タイトルに戻る
+    </button>
+    </section>
+
+  <!-- JavaScript -->
+   <script src="instructions.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
