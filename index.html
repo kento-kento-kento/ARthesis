@@ -27,19 +27,21 @@
       <a-box
         position="0 0.5 0"
         color="red"
-        wireframe="true"
+        wireframe="false" 
         scale="1 1 1">
       </a-box>
 
       <!-- 日本語のAR案内 -->
       <a-text
+        id="ar-instruction"
         value="この部品を
         取り付けて"
-        position="0 1 0"
+        position="0 1.1 0"
         rotation="-90 0 0"
         align="center"
         color="#FFFF00"
         width="6"
+        scale="0.7 0.7 0.7"
         font="https://cdn.jsdelivr.net/gh/studioTeaTwo/aframe-japanese-font@main/fonts/noto-sans-cjk-jp/noto-sans-cjk-jp-msdf.json"
         font-image="https://cdn.jsdelivr.net/gh/studioTeaTwo/aframe-japanese-font@main/fonts/noto-sans-cjk-jp/noto-sans-cjk-jp-msdf.png"
         shader="msdf"
@@ -74,6 +76,11 @@
       <option value="medium" selected>標準：手順・部品の向き</option>
       <option value="high">詳しい：注意点も表示</option>
     </select>
+    <div class="step-controls">
+        <button id="prev-step-button" type="button">前の手順に進む</button>
+        <span id="step-counter">手順 1 / 2</span>
+        <button id="next-step-button" type="button">次の手順に進む</button>
+    </div>
   </section>
 
   <!-- 設定パネルを開閉するボタン -->
@@ -88,6 +95,7 @@
   </button>
 
   <!-- JavaScript -->
+   <script src="instructions.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
