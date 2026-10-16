@@ -383,11 +383,33 @@ function endExperiment() {
   showScreen(endScreen);
 }
 
+/* 実験終了の確認画面 */
+const confirmEndDialog = document.getElementById(
+  "confirm-end-dialog"
+);
+const cancelEndButton = document.getElementById(
+  "cancel-end-button"
+);
+const confirmEndButton = document.getElementById(
+  "confirm-end-button"
+);
+
 /* 実験終了ボタン */
 endExperimentButton.addEventListener("click", () => {
-  if (confirm("実験を終了しますか？")) {
-    endExperiment();
-  }
+  if (isExperimentEnded) return;
+
+  confirmEndDialog.hidden = false;
+});
+
+/* キャンセル：AR画面に戻る */
+cancelEndButton.addEventListener("click", () => {
+  confirmEndDialog.hidden = true;
+});
+
+/* 終了を確定 */
+confirmEndButton.addEventListener("click", () => {
+  confirmEndDialog.hidden = true;
+  endExperiment();
 });
 
 /* 終了画面からタイトルへ */

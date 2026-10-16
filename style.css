@@ -389,3 +389,62 @@ a-scene {
 #end-screen[hidden] {
   display: none !important;
 }
+
+/* 実験終了の確認画面 */
+#confirm-end-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+#confirm-end-dialog[hidden] {
+  display: none !important;
+}
+
+.confirm-end-box {
+  width: 100%;
+  max-width: 320px;
+  padding: 22px 18px;
+  border-radius: 14px;
+  background: #fff;
+  color: #222;
+  text-align: center;
+}
+
+.confirm-end-box p {
+  margin: 0 0 20px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.confirm-end-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.confirm-end-buttons button {
+  flex: 1;
+  min-height: 42px;
+  padding: 8px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+#cancel-end-button {
+  background: #e5e7eb;
+  color: #222;
+}
+
+#confirm-end-button {
+  background: #dc2626;
+  color: #fff;
+}
