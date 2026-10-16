@@ -272,62 +272,65 @@ a-scene {
 
 
 
-/* 実験タイマー */
+/* 実験タイマー：画面右上 */
 .experiment-timer {
   position: fixed;
-  top: calc(max(8px, env(safe-area-inset-top)) + 46px);
-  left: 50%;
-  transform: translateX(-50%);
+  top: max(8px, env(safe-area-inset-top));
+  right: 8px;
+  left: auto;
+  transform: none;
   z-index: 1000;
 
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 5px;
 
-  padding: 7px 14px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.92);
+  padding: 5px 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
   color: #111;
-
-  font-size: 14px;
+  font-size: 12px;
   white-space: nowrap;
 }
 
 #elapsed-time {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 
-/* タイマー操作ボタン */
+/* タイマー操作ボタン：右上のタイマー直下 */
 .timer-controls {
   position: fixed;
-  top: calc(max(8px, env(safe-area-inset-top)) + 92px);
-  left: 50%;
-  transform: translateX(-50%);
+  top: calc(max(8px, env(safe-area-inset-top)) + 36px);
+  right: 8px;
+  left: auto;
+  transform: none;
   z-index: 1000;
 
   display: flex;
-  justify-content: center;
+  flex-direction: row;
+  justify-content: flex-end;
   align-items: center;
-  gap: 10px;
+  gap: 5px;
 
-  width: calc(100% - 24px);
-  max-width: 360px;
+  width: auto;
+  max-width: none;
 }
 
 .timer-controls button {
-  flex: 1;
+  flex: 0 0 auto;
   min-width: 0;
-  min-height: 44px;
-  padding: 10px 8px;
+  min-height: 32px;
+  padding: 5px 7px;
 
   border: none;
-  border-radius: 8px;
-  background: #fff;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.92);
   color: #222;
 
-  font-size: 14px;
+  font-size: 11px;
   font-weight: bold;
   white-space: nowrap;
 }
@@ -340,46 +343,31 @@ a-scene {
 /* スマートフォン向け */
 @media (max-width: 600px) {
   .experiment-timer {
-    top: calc(max(8px, env(safe-area-inset-top)) + 43px);
-    left: 50%;
-    padding: 6px 12px;
+    top: max(8px, env(safe-area-inset-top));
+    right: 6px;
+    padding: 4px 6px;
+    font-size: 11px;
   }
 
   #elapsed-time {
-    font-size: 17px;
+    font-size: 13px;
   }
 
   .timer-controls {
-    top: calc(max(8px, env(safe-area-inset-top)) + 88px);
-    left: 50%;
+    top: calc(max(8px, env(safe-area-inset-top)) + 32px);
+    right: 6px;
+    left: auto;
+    transform: none;
     flex-direction: row;
-    gap: 8px;
-    width: calc(100% - 32px);
+    gap: 4px;
   }
 
   .timer-controls button {
-    min-height: 42px;
-    font-size: 14px;
+    min-height: 30px;
+    padding: 5px 6px;
+    font-size: 10px;
   }
 }
-
-  .timer-controls {
-    top: calc(max(8px, env(safe-area-inset-top)) + 84px);
-    right: auto;
-    left: 50%;
-    transform: translateX(-50%);
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-    width: min(320px, calc(100vw - 32px));
-  }
-
-  .timer-controls button {
-    width: 100%;
-    min-height: 44px;
-    padding: 10px 12px;
-    white-space: nowrap;
-  }
 
 
 /* 終了画面 */
