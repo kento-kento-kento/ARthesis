@@ -275,7 +275,7 @@ a-scene {
 .experiment-timer {
   position: fixed;
   top: 5px;
-  left: 38%;
+  left: 60%;
   transform: translateX(-50%);
   z-index: 1000;
   display: flex;
@@ -303,8 +303,8 @@ a-scene {
 /* タイマー操作ボタン */
 .timer-controls {
   position: fixed;
-  top: 10px;
-  left: 65%;
+  top: 50px;
+  right: 10%;
   transform: translateX(-50%);
   z-index: 1000;
   display: flex;
@@ -318,6 +318,30 @@ a-scene {
   background: #fff;
   color: #222;
   font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .experiment-timer {
+    top: calc(max(8px, env(safe-area-inset-top)) + 42px);
+    left: 50%;
+    gap: 8px;
+    padding: 7px 12px;
+  }
+
+  .timer-controls {
+    top: calc(max(8px, env(safe-area-inset-top)) + 84px);
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    gap: 8px;
+    max-width: calc(100vw - 20px);
+  }
+
+  .timer-controls button {
+    min-height: 44px;
+    padding: 10px 12px;
+    white-space: nowrap;
+  }
 }
 
 /* 終了画面 */
