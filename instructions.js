@@ -1,56 +1,84 @@
-// このファイルは，何の部品がどの手順で
-// どの向きでどの位置に取り付けるかを，一元管理する。
-// カメラが部品を認識したら，それに対応した手順を表示する。
-
 
 /*
  * LEGO組み立て手順データ
  * ※以下は動作確認用の仮データです。
  * 実際のLEGOの組み立て手順ではありません。
+ *
+ * 条件A：逐次的な組立手順のみ
+ * 条件B：条件Aの情報＋部品群の構造・配置情報
  */
 
+// 条件A・Bで共通する組立手順
 const assemblySteps = [
   {
     step: 1,
 
-    // 部品を識別するためのID
-    partId: "part-A",
+    // 使用する部品
+    parts: [
+      {
+        partId: "part-A",
+        partName: "赤いブロック",
+        quantity: 1
+      }
+    ],
 
-    // 部品の基本情報
-    partName: "赤いブロック",
-    position: "マーカーの中央",
-
-    // 標準・詳しい表示で使う情報
-    orientation: "平らな面を上にする",
+    // 組み合わせ方
     procedure: "赤いブロックを取り付ける",
 
-    // 詳しい表示だけで使う情報
-    caution: "位置と向きを確認してから取り付ける"
+    // 取り付け位置・向き
+    position: "マーカーの中央",
+    orientation: "平らな面を上にする"
   },
 
   {
     step: 2,
-    partId: "part-B",
 
-    partName: "黒いブロック",
+    parts: [
+      {
+        partId: "part-B",
+        partName: "黒いブロック",
+        quantity: 1
+      }
+    ],
+
+    procedure: "黒いブロックを赤いブロックの右側に取り付ける",
     position: "赤いブロックの右側",
-
-    orientation: "突起を上にする",
-    procedure: "黒いブロックを右側に取り付ける",
-
-    caution: "隣の部品との隙間を確認する"
+    orientation: "突起を上にする"
   }
 ];
 
 
+// 条件Bでのみ提示する部品群の追加情報
+const groupInfo = {
+  2: {
+    // 部品群の名称
+    groupName: "ブロックのまとまり",
 
+    // 部品群の完成形
+    completedForm: "赤いブロックと黒いブロックを組み合わせた形",
+
+    // 部品同士の相対的な位置関係・接続箇所
+    internalStructure: "赤いブロックの右側に黒いブロックを接続する",
+
+    // 完成モデル内での配置位置
+    modelPosition: "マーカーの中央に配置する",
+
+    // 条件Bで表示する図のパス
+    structureImage: null,
+    placementImage: null
+  }
+};
 
 
 /*
- * 手順データと提示情報量から、
+ * 手順データと実験条件から、
  * ARに表示する文章を生成する
+ *
+ * condition:
+ *   "A" = 逐次的な組立手順のみ
+ *   "B" = 組立手順＋部品群の構造・配置情報
  */
-function getInstructionText(stepIndex, level) {
+function getInstructionText(stepIndex, condition) {
   const step = assemblySteps[stepIndex];
 
   // 指定された手順が存在しない場合
@@ -58,23 +86,30 @@ function getInstructionText(stepIndex, level) {
     return "表示できる手順がありません";
   }
 
-  // 少ない：部品名と取り付け位置
+  // 使用する部品と数量
+  const partLines = step.parts.map(part =>
+    `${part.partName} × ${part.quantity}`
+  );
+
   const lines = [
-    `部品\n${step.partName}`,
-    `取り付け位置\n${step.position}`
+    `使用する部品\n${partLines.join("\n")}`,
+    `作業手順\n${step.procedure}`,
+    `取り付け位置\n${step.position}`,
+    `部品の向き\n${step.orientation}`
   ];
 
-  // 標準：手順と向きを追加
-  if (level === "medium" || level === "high") {
-    lines.push(
-      `作業手順\n${step.procedure}`,
-      `部品の向き\n${step.orientation}`
-    );
-  }
+  // 条件Bの場合のみ追加情報を表示
+  if (condition === "B") {
+    const group = groupInfo[step.step];
 
-  // 詳しい：注意点を追加
-  if (level === "high") {
-    lines.push(`注意点\n${step.caution}`);
+    if (group) {
+      lines.push(
+        `部品群\n${group.groupName}`,
+        `完成形\n${group.completedForm}`,
+        `部品同士の位置関係・接続箇所\n${group.internalStructure}`,
+        `完成モデル内の配置位置\n${group.modelPosition}`
+      );
+    }
   }
 
   return lines.join("\n\n");

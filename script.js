@@ -1,7 +1,7 @@
 
 const settingsButton = document.getElementById("settings-button");
 const settingsPanel = document.getElementById("settings-panel");
-const levelSelect = document.getElementById("level-select");
+
 const arInstruction = document.getElementById("ar-instruction");
 
 const prevStepButton = document.getElementById("prev-step-button");
@@ -24,10 +24,17 @@ settingsButton.addEventListener("click", () => {
   setSettingsOpen(!isOpen);
 });
 
-/* 現在の手順番号。最初の手順は 0 */
+/* =========================
+   組立手順・実験条件の表示
+========================= */
+
+// 現在の手順番号。最初の手順は0
 let currentStepIndex = 0;
 
-/* 手順番号とボタンの状態を更新 */
+// 現在の実験条件
+let currentCondition = "A";
+
+// 手順番号とボタンの状態を更新
 function updateStepControls() {
   stepCounter.textContent =
     `手順 ${currentStepIndex + 1} / ${assemblySteps.length}`;
@@ -38,22 +45,20 @@ function updateStepControls() {
     currentStepIndex === assemblySteps.length - 1;
 }
 
-/* 現在の手順と提示情報量に応じてAR表示を更新 */
+// 現在の手順と実験条件に応じてAR表示を更新
 function updateInstruction() {
-  const selectedLevel = levelSelect.value;
-
   arInstruction.setAttribute(
     "value",
-    getInstructionText(currentStepIndex, selectedLevel)
+    getInstructionText(currentStepIndex, currentCondition)
   );
 
   updateStepControls();
 
   console.log("現在の手順番号:", currentStepIndex + 1);
-  console.log("提示情報量:", selectedLevel);
+  console.log("実験条件:", currentCondition);
 }
 
-/* 次の手順へ */
+// 次の手順へ
 nextStepButton.addEventListener("click", () => {
   if (currentStepIndex < assemblySteps.length - 1) {
     currentStepIndex++;
@@ -61,7 +66,7 @@ nextStepButton.addEventListener("click", () => {
   }
 });
 
-/* 前の手順へ */
+// 前の手順へ
 prevStepButton.addEventListener("click", () => {
   if (currentStepIndex > 0) {
     currentStepIndex--;
@@ -69,10 +74,7 @@ prevStepButton.addEventListener("click", () => {
   }
 });
 
-/* 提示情報量の変更 */
-levelSelect.addEventListener("change", updateInstruction);
-
-/* 初期表示 */
+// 初期表示
 updateInstruction();
 
 
@@ -133,74 +135,25 @@ const setupError = document.getElementById("setup-error");
 let currentExperiment = null;
 
 
-/* 実験条件に応じて情報量を設定する */
-function applyExperimentCondition(condition) {
-  if (condition === "fixed_low") {
-    levelSelect.value = "low";
-    levelSelect.disabled = true;
-  } else if (condition === "fixed_medium") {
-    levelSelect.value = "medium";
-    levelSelect.disabled = true;
-  } else if (condition === "fixed_high") {
-    levelSelect.value = "high";
-    levelSelect.disabled = true;
-  } else if (condition === "self_adjust") {
-    levelSelect.disabled = false;
-  }
 
-  updateInstruction();
+/* =========================
+   実験条件A/Bの管理
+========================= */
 
-  console.log("実験条件:", condition);
-  console.log("設定された情報量:", levelSelect.value);
-}
-
-
-
-/* 実験条件の切り替え */
-const nextConditionButton = document.getElementById(
-  "next-condition-button"
-);
 const currentConditionLabel = document.getElementById(
   "current-condition-label"
 );
 
-const experimentConditions = [
-  { value: "fixed_low", label: "情報量固定：少ない" },
-  { value: "fixed_medium", label: "情報量固定：標準" },
-  { value: "fixed_high", label: "情報量固定：詳しい" },
-  { value: "self_adjust", label: "情報量を自己調整" }
-];
-
-let currentConditionIndex = 0;
-
-/* 現在の条件名を表示 */
+// 現在の条件名を表示
 function updateConditionLabel() {
-  const condition = experimentConditions[currentConditionIndex];
+  const conditionName =
+    currentCondition === "A"
+      ? "条件A：逐次的な組立手順のみ"
+      : "条件B：組立手順＋部品群の構造・配置情報";
+
   currentConditionLabel.textContent =
-    `現在の条件：${condition.label}`;
+    `現在の条件：${conditionName}`;
 }
-
-/* 次の実験条件へ進む */
-nextConditionButton.addEventListener("click", () => {
-  currentConditionIndex++;
-
-  if (currentConditionIndex >= experimentConditions.length) {
-    currentConditionIndex = 0;
-  }
-
-  const nextCondition = experimentConditions[currentConditionIndex];
-
-  conditionSelect.value = nextCondition.value;
-
-  if (currentExperiment) {
-    currentExperiment.condition = nextCondition.value;
-  }
-
-  applyExperimentCondition(nextCondition.value);
-  updateConditionLabel();
-
-  console.log("実験条件を切り替えました:", nextCondition.label);
-});
 
 
 /* 実験開始 */
@@ -238,16 +191,12 @@ document.getElementById("start-ar-button").addEventListener("click", () => {
 
 
 /* 実験条件をAR画面に反映 */
-    currentConditionIndex = experimentConditions.findIndex(
-    (item) => item.value === condition
-    );
+    currentCondition = condition;
 
-    if (currentConditionIndex === -1) {
-    currentConditionIndex = 0;
-    }
+    currentStepIndex = 0;
 
-    applyExperimentCondition(condition);
     updateConditionLabel();
+    updateInstruction();
 
     /* AR画面を表示 */
     showScreen(null);
