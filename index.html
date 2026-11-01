@@ -33,17 +33,17 @@
 
     <!-- ② 操作説明画面 -->
     <section id="help-screen" class="app-screen" hidden>
-    <h2>操作説明</h2>
-    <ol>
+      <h2>操作説明</h2>
+      <ol>
         <li>画面の案内に従って組み立て作業を進めます。</li>
         <li>前の手順・次の手順で表示する手順を切り替えます。</li>
-        <li>情報量の設定から案内の詳しさを変更できます。</li>
-        <li>実験中は、指定された条件に従って操作してください。</li>
-    </ol>
+        <li>実験中は、画面に表示される案内に従って作業してください。</li>
+        <li>一時停止や実験終了は、画面上のボタンから操作できます。</li>
+      </ol>
 
-    <button id="help-back-button" type="button">
+      <button id="help-back-button" type="button">
         タイトルに戻る
-    </button>
+      </button>
     </section>
 
 
@@ -92,10 +92,8 @@
 
   <label for="experiment-condition">実験条件</label>
   <select id="experiment-condition">
-    <option value="fixed_low">情報量固定：少ない</option>
-    <option value="fixed_medium">情報量固定：標準</option>
-    <option value="fixed_high">情報量固定：詳しい</option>
-    <option value="self_adjust" selected>情報量を自己調整</option>
+    <option value="A">条件A：逐次的な組立手順のみ</option>
+    <option value="B">条件B：組立手順＋部品群の構造・配置情報</option>
   </select>
 
   <p id="setup-error" role="alert"></p>
@@ -151,16 +149,9 @@
 
     <a-entity camera></a-entity>
   </a-scene>
-
-  <!-- コンパクトな上部タイトル -->
-  <header class="top-panel">
-    <h1>AR組立作業サポート</h1>
-  </header>
-
   
     <!-- 実験経過時間 -->
     <div id="experiment-timer" class="experiment-timer" hidden>
-    <span>実験経過時間</span>
     <span id="elapsed-time">00:00:00</span>
     </div>
 
@@ -170,35 +161,28 @@
     <button id="end-experiment-button" type="button">実験終了</button>
     </div>
 
-  <!-- 提示情報量の設定パネル -->
+  <!-- 設定パネル -->
   <section
     id="settings-panel"
     class="bottom-panel"
-    aria-label="提示情報量の設定"
+    aria-label="組立手順の操作"
     aria-hidden="true">
 
-    <p class="panel-title">提示情報量</p>
-        <div class="condition-controls">
-    <p class="panel-title">実験条件</p>
-    <p id="current-condition-label">現在の条件：未設定</p>
-    <button id="next-condition-button" type="button">
-        次の実験条件へ進む
-    </button>
+    <div class="condition-controls">
+      <p class="panel-title">実験条件</p>
+      <p id="current-condition-label">現在の条件：未設定</p>
     </div>
 
-    <select
-      id="level-select"
-      class="level-select"
-      aria-label="提示情報量を選択">
-
-      <option value="low">少ない：部品・取り付け位置</option>
-      <option value="medium" selected>標準：手順・部品の向き</option>
-      <option value="high">詳しい：注意点も表示</option>
-    </select>
     <div class="step-controls">
-        <button id="prev-step-button" type="button">前の手順に進む</button>
-        <span id="step-counter">手順 1 / 2</span>
-        <button id="next-step-button" type="button">次の手順に進む</button>
+      <button id="prev-step-button" type="button">
+        前の手順
+      </button>
+
+      <span id="step-counter">手順 1 / 2</span>
+
+      <button id="next-step-button" type="button">
+        次の手順
+      </button>
     </div>
   </section>
 
@@ -224,8 +208,23 @@
     </button>
     </section>
 
+  <!-- 実験終了の確認画面 -->
+  <div id="confirm-end-dialog" hidden>
+    <div class="confirm-end-box">
+      <p>実験を終了しますか？</p>
+      <div class="confirm-end-buttons">
+        <button id="cancel-end-button" type="button">
+          キャンセル
+        </button>
+        <button id="confirm-end-button" type="button">
+          終了する
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- JavaScript -->
-   <script src="instructions.js"></script>
+  <script src="instructions.js"></script>
   <script src="script.js"></script>
-</body>
+  </body>
 </html>
