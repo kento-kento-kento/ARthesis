@@ -61,16 +61,30 @@ function updateInstruction() {
 // 次の手順へ
 nextStepButton.addEventListener("click", () => {
   if (currentStepIndex < assemblySteps.length - 1) {
+    const previousStepIndex = currentStepIndex;
+
     currentStepIndex++;
     updateInstruction();
+
+    recordExperimentEvent("next_step", {
+      fromStep: previousStepIndex + 1,
+      toStep: currentStepIndex + 1
+    });
   }
 });
 
 // 前の手順へ
 prevStepButton.addEventListener("click", () => {
   if (currentStepIndex > 0) {
+    const previousStepIndex = currentStepIndex;
+
     currentStepIndex--;
     updateInstruction();
+
+    recordExperimentEvent("previous_step", {
+      fromStep: previousStepIndex + 1,
+      toStep: currentStepIndex + 1
+    });
   }
 });
 
@@ -134,6 +148,70 @@ const setupError = document.getElementById("setup-error");
 
 let currentExperiment = null;
 
+/* =========================
+   実験ログの保存
+========================= */
+
+const LOG_STORAGE_KEY = "ar-assembly-experiment-logs";
+
+// 保存済みの実験ログを取得
+function loadExperimentLogs() {
+  const savedLogs = localStorage.getItem(LOG_STORAGE_KEY);
+
+  if (!savedLogs) {
+    return [];
+  }
+
+  try {
+    return JSON.parse(savedLogs);
+  } catch (error) {
+    console.error("実験ログの読み込みに失敗しました:", error);
+    return [];
+  }
+}
+
+// 実験ログを保存
+function saveExperimentLogs(logs) {
+  localStorage.setItem(
+    LOG_STORAGE_KEY,
+    JSON.stringify(logs)
+  );
+}
+
+// 現在の実験ログを保存済みデータに反映
+function updateSavedExperimentLog() {
+  if (!currentExperiment) return;
+
+  const logs = loadExperimentLogs();
+
+  // experimentIdで更新対象を特定
+  const index = logs.findIndex(log =>
+    log.experimentId === currentExperiment.experimentId
+  );
+
+  if (index !== -1) {
+    logs[index] = currentExperiment;
+    saveExperimentLogs(logs);
+  }
+}
+
+  // 実験中の操作履歴を記録
+  function recordExperimentEvent(type, details = {}) {
+    if (!currentExperiment) return;
+
+    const event = {
+      type,
+      timestamp: new Date().toISOString(),
+      step: currentStepIndex + 1,
+      ...details
+    };
+
+    currentExperiment.events.push(event);
+
+    // 操作履歴を保存済みログに反映
+    updateSavedExperimentLog();
+  }
+
 
 
 /* =========================
@@ -179,12 +257,30 @@ document.getElementById("start-ar-button").addEventListener("click", () => {
   }
 
   currentExperiment = {
+    // 実験ごとに一意のIDを発行
+    experimentId: crypto.randomUUID(),
+
     participantId,
     sessionId,
     age,
     arExperience,
     assemblyExperience,
-    condition
+    condition,
+
+    // 実験開始日時
+    startedAt: new Date().toISOString(),
+
+    // 実験終了日時（終了時に設定）
+    endedAt: null,
+
+    // 作業時間（ミリ秒）
+    durationMs: 0,
+
+    // 操作履歴
+    events: [],
+
+    // 作業ミスの記録
+    errors: []
   };
 
   setupError.textContent = "";
@@ -205,6 +301,15 @@ document.getElementById("start-ar-button").addEventListener("click", () => {
     startExperimentTimer();
 
   console.log("登録した実験情報:", currentExperiment);
+
+  // 実験開始時のログを保存
+  const logs = loadExperimentLogs();
+
+  logs.push(currentExperiment);
+
+  saveExperimentLogs(logs);
+
+
 });
 
 
@@ -296,12 +401,16 @@ function resumeExperimentTimer() {
   startExperimentTimer();
 }
 
-/* 一時停止ボタン */
+/* 一時停止・再開ボタン */
 pauseTimerButton.addEventListener("click", () => {
   if (isTimerRunning) {
     pauseExperimentTimer();
+
+    recordExperimentEvent("pause_timer");
   } else {
     resumeExperimentTimer();
+
+    recordExperimentEvent("resume_timer");
   }
 });
 
@@ -311,6 +420,17 @@ function endExperiment() {
 
   if (isTimerRunning) {
     accumulatedTime += performance.now() - experimentStartTime;
+  }
+
+  // 実験終了日時と作業時間を記録
+  if (currentExperiment) {
+    currentExperiment.endedAt = new Date().toISOString();
+    currentExperiment.durationMs = Math.floor(accumulatedTime);
+
+    // 保存済みの実験ログを更新
+    updateSavedExperimentLog();
+
+
   }
 
   experimentStartTime = null;

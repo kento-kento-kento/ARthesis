@@ -1,0 +1,144 @@
+
+/* 管理画面の基本設定 */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f4f6f9;
+  color: #333;
+  font-family: sans-serif;
+}
+
+/* メインコンテナ */
+.admin-container {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 24px;
+}
+
+/* メインタイトル */
+.admin-container h1 {
+  margin-bottom: 32px;
+  font-size: 28px;
+}
+
+/* 各セクション */
+.admin-container section {
+  padding: 24px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* セクションタイトル */
+.admin-container h2 {
+  margin-top: 0;
+  font-size: 20px;
+}
+
+/* 作業ミスの表示カード */
+.error-card {
+  margin-top: 12px;
+  padding: 16px;
+  background-color: #f4f6f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  line-height: 1.8;
+}
+
+.error-card p {
+  margin: 0;
+  white-space: pre-line;
+}
+
+/* 作業ミス登録エリア */
+#error-entry-section {
+  margin-top: 28px;
+  padding: 24px;
+  background-color: #f8f9fb;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+/* 登録エリアのタイトル */
+#error-entry-section h3 {
+  margin-top: 0;
+  margin-bottom: 24px;
+  font-size: 20px;
+}
+
+/* ラベル */
+#error-entry-section label {
+  display: block;
+  margin-top: 18px;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+/* 入力欄 */
+#error-entry-section select,
+#error-entry-section input[type="number"],
+#error-entry-section input[type="text"],
+#error-entry-section textarea {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 600px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+/* 詳細入力欄 */
+#error-entry-section textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* 自己修正チェックボックス */
+#error-entry-section input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+/* 登録ボタン */
+#save-error-button {
+  display: block;
+  margin-top: 24px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  background-color: #2563eb;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+#save-error-button:hover {
+  background-color: #1d4ed8;
+}
+
+/* 参加者・実験情報 */
+.experiment-info {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 24px;
+  padding: 20px;
+  background-color: #f4f6f9;
+  border-radius: 8px;
+}
+
+.experiment-info p {
+  margin: 8px 0;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.experiment-info strong {
+  display: inline-block;
+  margin-right: 4px;
+}
+
+@media (max-width: 600px) {
+  .experiment-info {
+    grid-template-columns: 1fr;
+  }
+}
