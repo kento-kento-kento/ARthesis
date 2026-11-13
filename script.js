@@ -502,3 +502,23 @@ function resetExperimentTimer() {
   experimentTimer.hidden = true;
   timerControls.hidden = true;
 }
+
+/* =========================
+   カメラ映像の確認
+========================= */
+
+const captureSendButton = document.getElementById("capture-send-button");
+
+captureSendButton.addEventListener("click", () => {
+  const videos = document.querySelectorAll("video");
+
+  console.log("検出したvideo要素の数:", videos.length);
+
+  videos.forEach((video, index) => {
+    console.log(`video ${index}:`, {
+      width: video.videoWidth,
+      height: video.videoHeight,
+      readyState: video.readyState
+    });
+  });
+});
