@@ -669,4 +669,15 @@ function showDetectionOnCamera(result) {
   detectionOverlayElement.appendChild(center);
 
   console.log("画面上に検出結果を表示しました");
+
+  // 3秒後に検出表示を消す（動作確認用）
+  setTimeout(() => {
+    if (detectionOverlayElement) {
+      detectionOverlayElement.remove();
+      detectionOverlayElement = null;
+    }
+
+    console.log("検出表示を削除しました");
+  }, 3000);
+
 }
