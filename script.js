@@ -596,6 +596,9 @@ let detectionOverlayElement = null;
 
 function showDetectionOnCamera(result) {
 
+  console.log("showDetectionOnCameraを実行しました");
+  console.log("Pythonの検出結果:", result);
+
   const video = document.querySelector("video");
 
   if (!video) {
@@ -613,6 +616,19 @@ function showDetectionOnCamera(result) {
 
   // カメラ映像の画面上の位置と大きさ
   const videoRect = video.getBoundingClientRect();
+
+  console.log("映像の表示領域:", {
+    left: videoRect.left,
+    top: videoRect.top,
+    width: videoRect.width,
+    height: videoRect.height
+  });
+
+  console.log("画像サイズ:", {
+    width: result.image_width,
+    height: result.image_height
+  });
+
 
   // 画像座標を画面座標に変換する倍率
   const scaleX = videoRect.width / result.image_width;
