@@ -504,25 +504,49 @@ function resetExperimentTimer() {
 }
 
 
+
 /* =========================
-   カメラ画像をPythonに送信
+   カメラ画像をPythonに自動送信
 ========================= */
 
 const captureSendButton = document.getElementById("capture-send-button");
 
-captureSendButton.addEventListener("click", async () => {
-  const video = document.querySelector("video");
+let isAutoSending = false;
+const sendInterval = 700;
 
-  // カメラ映像の確認
-  if (!video || video.videoWidth === 0 || video.videoHeight === 0) {
-    alert("カメラ映像を取得できません。カメラが起動しているか確認してください。");
+// ボタンで自動送信の開始・停止を切り替える
+captureSendButton.addEventListener("click", () => {
+
+  if (isAutoSending) {
+    // 自動送信を停止
+    isAutoSending = false;
+    captureSendButton.textContent = "自動送信を開始";
+    console.log("自動送信を停止しました");
     return;
   }
 
-  captureSendButton.disabled = true;
-  captureSendButton.textContent = "送信中...";
+  // 自動送信を開始
+  isAutoSending = true;
+  captureSendButton.textContent = "自動送信を停止";
+  console.log("自動送信を開始しました");
+
+  sendCameraImage();
+});
+
+
+// カメラ画像をPythonに送信する関数
+async function sendCameraImage() {
+
+  if (!isAutoSending) return;
 
   try {
+    const video = document.querySelector("video");
+
+    // カメラ映像の確認
+    if (!video || video.videoWidth === 0 || video.videoHeight === 0) {
+      throw new Error("カメラ映像を取得できません");
+    }
+
     // カメラ映像から静止画を作成
     const canvas = document.createElement("canvas");
 
@@ -567,9 +591,8 @@ captureSendButton.addEventListener("click", async () => {
 
     console.log("Pythonからの応答:", result);
 
+    // 検出結果をカメラ映像に表示
     showDetectionOnCamera(result);
-
-    //alert("画像をPythonに送信しました。");
 
     // 送信成功を実験ログに記録
     recordExperimentEvent("image_sent", {
@@ -579,13 +602,21 @@ captureSendButton.addEventListener("click", async () => {
 
   } catch (error) {
     console.error("画像送信エラー:", error);
-    alert("画像の送信に失敗しました。Consoleを確認してください。");
 
-  } finally {
-    captureSendButton.disabled = false;
-    captureSendButton.textContent = "画像をPythonに送信";
+    // エラーが発生したら自動送信を停止
+    isAutoSending = false;
+    captureSendButton.textContent = "自動送信を開始";
+
+    alert("画像の送信に失敗しました。Consoleを確認してください。");
+    return;
   }
-});
+
+  // 前回の送信完了から700ミリ秒後に次の送信
+  if (isAutoSending) {
+    setTimeout(sendCameraImage, sendInterval);
+  }
+}
+
 
 
 /* =========================
