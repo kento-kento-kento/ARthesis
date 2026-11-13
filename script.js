@@ -503,22 +503,83 @@ function resetExperimentTimer() {
   timerControls.hidden = true;
 }
 
+
 /* =========================
-   カメラ映像の確認
+   カメラ画像をPythonに送信
 ========================= */
 
 const captureSendButton = document.getElementById("capture-send-button");
 
-captureSendButton.addEventListener("click", () => {
-  const videos = document.querySelectorAll("video");
+captureSendButton.addEventListener("click", async () => {
+  const video = document.querySelector("video");
 
-  console.log("検出したvideo要素の数:", videos.length);
+  // カメラ映像の確認
+  if (!video || video.videoWidth === 0 || video.videoHeight === 0) {
+    alert("カメラ映像を取得できません。カメラが起動しているか確認してください。");
+    return;
+  }
 
-  videos.forEach((video, index) => {
-    console.log(`video ${index}:`, {
-      width: video.videoWidth,
-      height: video.videoHeight,
-      readyState: video.readyState
+  captureSendButton.disabled = true;
+  captureSendButton.textContent = "送信中...";
+
+  try {
+    // カメラ映像から静止画を作成
+    const canvas = document.createElement("canvas");
+
+    const maxWidth = 640;
+    const scale = Math.min(1, maxWidth / video.videoWidth);
+
+    canvas.width = Math.round(video.videoWidth * scale);
+    canvas.height = Math.round(video.videoHeight * scale);
+
+    const context = canvas.getContext("2d");
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // JPEG画像に変換
+    const blob = await new Promise((resolve, reject) => {
+      canvas.toBlob((result) => {
+        if (result) {
+          resolve(result);
+        } else {
+          reject(new Error("画像の変換に失敗しました"));
+        }
+      }, "image/jpeg", 0.8);
     });
-  });
+
+    // Pythonに送信するデータを作成
+    const formData = new FormData();
+    formData.append("file", blob, "capture.jpg");
+
+    // Pythonサーバーへ送信
+    const response = await fetch(
+      "https://proposition-puerto-fog-implementing.trycloudflare.com/upload",
+      {
+        method: "POST",
+        body: formData
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`サーバーエラー: ${response.status}`);
+    }
+
+    const result = await response.json();
+
+    console.log("Pythonからの応答:", result);
+    alert("画像をPythonに送信しました。");
+
+    // 送信成功を実験ログに記録
+    recordExperimentEvent("image_sent", {
+      imageWidth: canvas.width,
+      imageHeight: canvas.height
+    });
+
+  } catch (error) {
+    console.error("画像送信エラー:", error);
+    alert("画像の送信に失敗しました。Consoleを確認してください。");
+
+  } finally {
+    captureSendButton.disabled = false;
+    captureSendButton.textContent = "画像をPythonに送信";
+  }
 });
