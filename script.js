@@ -569,7 +569,7 @@ captureSendButton.addEventListener("click", async () => {
 
     // showDetectionOnCamera(result);
 
-    alert("画像をPythonに送信しました。");
+    //alert("画像をPythonに送信しました。");
 
     // 送信成功を実験ログに記録
     recordExperimentEvent("image_sent", {
