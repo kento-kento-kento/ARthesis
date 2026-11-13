@@ -567,7 +567,7 @@ captureSendButton.addEventListener("click", async () => {
 
     console.log("Pythonからの応答:", result);
 
-    // showDetectionOnCamera(result);
+    showDetectionOnCamera(result);
 
     //alert("画像をPythonに送信しました。");
 
