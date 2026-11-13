@@ -566,6 +566,9 @@ captureSendButton.addEventListener("click", async () => {
     const result = await response.json();
 
     console.log("Pythonからの応答:", result);
+
+    showDetectionOnCamera(result);
+
     alert("画像をPythonに送信しました。");
 
     // 送信成功を実験ログに記録
@@ -583,3 +586,87 @@ captureSendButton.addEventListener("click", async () => {
     captureSendButton.textContent = "画像をPythonに送信";
   }
 });
+
+
+/* =========================
+   Pythonの検出結果をカメラ映像に表示
+========================= */
+
+let detectionOverlayElement = null;
+
+function showDetectionOnCamera(result) {
+
+  const video = document.querySelector("video");
+
+  if (!video) {
+    console.error("カメラ映像が見つかりません");
+    return;
+  }
+
+  if (!result.detections || result.detections.length === 0) {
+    console.log("検出された物体はありません");
+    return;
+  }
+
+  // 最も面積の大きい検出候補を取得
+  const detection = result.detections[0];
+
+  // カメラ映像の画面上の位置と大きさ
+  const videoRect = video.getBoundingClientRect();
+
+  // 画像座標を画面座標に変換する倍率
+  const scaleX = videoRect.width / result.image_width;
+  const scaleY = videoRect.height / result.image_height;
+
+  // 表示用のレイヤーを作成
+  if (!detectionOverlayElement) {
+
+    detectionOverlayElement = document.createElement("div");
+
+    detectionOverlayElement.style.position = "fixed";
+    detectionOverlayElement.style.inset = "0";
+    detectionOverlayElement.style.zIndex = "99999";
+    detectionOverlayElement.style.pointerEvents = "none";
+
+    document.body.appendChild(detectionOverlayElement);
+  }
+
+  // 前回の検出表示を消す
+  detectionOverlayElement.replaceChildren();
+
+  // 緑色の矩形
+  const rectangle = document.createElement("div");
+
+  rectangle.style.position = "absolute";
+  rectangle.style.left =
+    (videoRect.left + detection.x * scaleX) + "px";
+  rectangle.style.top =
+    (videoRect.top + detection.y * scaleY) + "px";
+  rectangle.style.width =
+    (detection.width * scaleX) + "px";
+  rectangle.style.height =
+    (detection.height * scaleY) + "px";
+
+  rectangle.style.border = "3px solid lime";
+  rectangle.style.boxSizing = "border-box";
+
+  // 赤色の中心点
+  const center = document.createElement("div");
+
+  center.style.position = "absolute";
+  center.style.left =
+    (videoRect.left + detection.center_x * scaleX) + "px";
+  center.style.top =
+    (videoRect.top + detection.center_y * scaleY) + "px";
+
+  center.style.width = "12px";
+  center.style.height = "12px";
+  center.style.backgroundColor = "red";
+  center.style.borderRadius = "50%";
+  center.style.transform = "translate(-50%, -50%)";
+
+  detectionOverlayElement.appendChild(rectangle);
+  detectionOverlayElement.appendChild(center);
+
+  console.log("画面上に検出結果を表示しました");
+}
